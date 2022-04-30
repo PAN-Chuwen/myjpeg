@@ -23,6 +23,19 @@ def extract_DC_AC(padded_matrix,dc,ac):
         tmp_array = zigzag_block_to_array(quanted_block)
         dc[block_index] = tmp_array[0]
         ac[block_index:block_index+63]=tmp_array[1:64]
+        if(block_index==0): print("quanted_block:",quanted_block)
+
+def restore_quanted_matrix_from_DC_AC(dc,ac,block_row_total, block_col_total):
+    restored_matrix = np.empty((8*block_row_total,8*block_col_total),dtype=int)
+    tmp_block = np.empty((8,8),dtype=int)
+    for row in range(0,block_row_total):
+        for col in range(0,block_col_total):
+            block_index = row*block_col_total + col
+            tmp_block = zigzag_array_to_block(np.concatenate((dc[block_index:block_index+1],ac[63*block_index:63*block_index+63])))
+            restored_matrix[row*8:row*8+8,col*8:col*8+8] = tmp_block
+    return restored_matrix
+
+
 
 print(Y_padded)
 print(Y_padded.shape)
@@ -37,6 +50,7 @@ print(y_block_num,cb_block_num,cr_block_num)
 
 dc_y = np.empty(y_block_num,dtype=int)
 ac_y = np.empty(y_block_num*63,dtype=int)
+
 
 dc_cb = np.empty(cb_block_num,dtype=int)
 ac_cb = np.empty(cb_block_num*63,dtype=int)
@@ -62,10 +76,10 @@ print("dc_cb.shape",dc_cb.shape)
 print("ac_cb",ac_cb)
 print("ac_cb.shape",ac_cb.shape)
 
+y_restored_quant_matrix = restore_quanted_matrix_from_DC_AC(dc_y,ac_y,int(Y_padded.shape[0]/8),int(Y_padded.shape[1]/8))
 
 
-#dequant block
-
+print("Y_quant_restored:",y_restored_quant_matrix)
 
 
 
