@@ -36,8 +36,6 @@ def zigzag_sequence_generator(n): #this IS a generator, NOT a function
             elif(point[0]==0):
                 state = MOVING_RIGHT
 
-
-
 n = 8
 zigzag_sequence_array = np.empty((64,2),dtype=int)
 for point in zigzag_sequence_generator(n):
@@ -46,6 +44,25 @@ for (i,point) in zigzag_sequence_generator(n):
     zigzag_sequence_array[i] = point
 print(zigzag_sequence_array)
 
+def zigzag_block_to_array(block_quant_known):
+    array = np.empty((64),dtype=int)
+    for i,point in enumerate(zigzag_sequence_array):
+        array[i] = block_quant_known[tuple(point)]
+    return array
+
+
+def zigzag_array_to_block(array_known):
+    block = np.empty((8,8),dtype=int)
+    for i,point in enumerate(zigzag_sequence_array):
+        block[tuple(point)] = array_known[i]
+    return block
+
+
+
+
+
+
+# block_quant_known =  np.random.rand(0,100, (8,8))
 block_quant_known =  np.random.randint(0,100, (8,8))
 array_generate = np.empty((64),dtype=int)
 for i,point in enumerate(zigzag_sequence_array):
@@ -55,6 +72,8 @@ print("==============")
 print("block-->array")
 print(block_quant_known)
 print(array_generate)
+print("array_using_func:",zigzag_block_to_array(block_quant_known))
+print("array_using_func:",zigzag_block_to_array(block_quant_known))
 
 
 array_known = np.random.randint(0,100,(64))
@@ -65,5 +84,5 @@ for i,point in enumerate(zigzag_sequence_array):
 
 print("==============")
 print("array->block")
-print(block_quant_known)
-print(array_generate)
+print(array_known)
+print(block_generate)
