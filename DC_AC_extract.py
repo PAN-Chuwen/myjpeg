@@ -17,8 +17,8 @@ def block_generator(padded_matrix):
 
 #need to change later, we need to do it in parallel
 #this function is somehow mixed(quant+zigzag+extract dc/ac), because we dont want to revisit each block
-def quant_and_extract_DC_AC_from_padded_matrix(padded_matrix):
-    block_total = int(padded_matrix.size()/64)
+def dct_quant_and_extract_DC_AC_from_padded_matrix(padded_matrix):
+    block_total = int(padded_matrix.size/64)
     dc = np.empty(block_total,dtype=int)
     ac_arrays = np.empty((block_total,63),dtype=int)
     tmp_array = np.empty(64,dtype=int)
@@ -30,38 +30,38 @@ def quant_and_extract_DC_AC_from_padded_matrix(padded_matrix):
     return dc,ac_arrays
 
 
-def restore_quanted_matrix_from_DC_AC(dc,ac_arrays,block_row_total, block_col_total):
+def restore_padded_matrix_from_DC_AC(dc,ac_arrays,block_row_total, block_col_total,type):
     restored_matrix = np.empty((8*block_row_total,8*block_col_total),dtype=int)
     tmp_block = np.empty((8,8),dtype=int)
     for row in range(0,block_row_total):
         for col in range(0,block_col_total):
             block_index = row*block_col_total + col
             tmp_block = zigzag_array_to_block(np.concatenate((dc[block_index:block_index+1],ac_arrays[block_index])))
-            restored_matrix[row*8:row*8+8,col*8:col*8+8] = tmp_block
+            restored_matrix[row*8:row*8+8,col*8:col*8+8] = iDCT_2D(dequant_block(tmp_block,type))
     return restored_matrix
 
 
 
-print(Y_padded)
-print(Y_padded.shape)
-print(Cb_padded)
-print(Cr_padded)
+# print(Y_padded)
+# print(Y_padded.shape)
+# print(Cb_padded)
+# print(Cr_padded)
 
 
-y_block_num = int(Y_padded.size/64)
-cb_block_num = int(Cb_padded.size/64)
-cr_block_num = int(Cr_padded.size/64)
-print(y_block_num,cb_block_num,cr_block_num)
+# y_block_num = int(Y_padded.size/64)
+# cb_block_num = int(Cb_padded.size/64)
+# cr_block_num = int(Cr_padded.size/64)
+# print(y_block_num,cb_block_num,cr_block_num)
 
-dc_y = np.empty(y_block_num,dtype=int)
-ac_y = np.empty(y_block_num*63,dtype=int)
+# dc_y = np.empty(y_block_num,dtype=int)
+# ac_y = np.empty(y_block_num*63,dtype=int)
 
 
-dc_cb = np.empty(cb_block_num,dtype=int)
-ac_cb = np.empty(cb_block_num*63,dtype=int)
+# dc_cb = np.empty(cb_block_num,dtype=int)
+# ac_cb = np.empty(cb_block_num*63,dtype=int)
 
-dc_cr = np.empty(cr_block_num,dtype=int)
-ac_cr = np.empty(cr_block_num*63,dtype=int)
+# dc_cr = np.empty(cr_block_num,dtype=int)
+# ac_cr = np.empty(cr_block_num*63,dtype=int)
 
 
 
